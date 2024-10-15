@@ -3,22 +3,21 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 import subprocess
 
-
 def run_binance_script():
-    subprocess.run(['python', './binance_prices.py'], check=True)
-
+   subprocess.run(['python', '../binance_prices.py'], check=True)
+   print("Extrayendo datos...") 
 
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 10, 12),  
+    'start_date': datetime(2024, 10, 13),  
     'retries': 1,
 }
 
 
 with DAG('binance_data_extraction',
          default_args=default_args,
-         schedule_interval='@daily',  
+         schedule='@daily',
          catchup=False) as dag:
 
    
