@@ -25,4 +25,8 @@ def transform_data():
         return df
     else:
         print("Error en la solicitud:", response.status_code)
-        return None
+        # Retornar un DataFrame vacío en caso de error
+        return pd.DataFrame(columns=['Open Time', 'Open', 'High', 'Low', 'Close', 
+                                      'Volume', 'Close Time', 'Quote Asset Volume', 
+                                      'Number of Trades', 'Taker Buy Base Asset Volume', 
+                                      'Taker Buy Quote Asset Volume', 'Ignore'])
