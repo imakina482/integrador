@@ -1,0 +1,43 @@
+# Archivos de configuración de entornos virtuales
+venv/
+env/
+.Python
+*.env
+*.cfg
+*.yaml
+
+# Archivos de configuración de editor
+.vscode/
+.idea/
+*.swp
+
+# Archivos temporales y de caché
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de log
+*.log
+logs/
+
+# Archivos de salida y PID de Airflow
+airflow/*.err
+airflow/*.log
+airflow/*.out
+airflow/*.pid
+
+# Base de datos de Airflow
+airflow.db
+# Config. de Airflow
+airflow/webserver_config.py
+
+# Archivos de dependencia y compilación
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Docker-related
+docker-compose.yml
+Dockerfile
