@@ -38,6 +38,3 @@ airflow/webserver_config.py
 *.manifest
 *.spec
 
-# Docker-related
-docker-compose.yml
-Dockerfile
