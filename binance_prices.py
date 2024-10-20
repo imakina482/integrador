@@ -1,4 +1,5 @@
 import requests
+import pandas as pd
 
 def get_binance_prices():
     """
@@ -21,9 +22,12 @@ def get_binance_prices():
     except Exception as err:
         print(f"An error occurred: {err}")
 
-
 if __name__ == "__main__":
     current_prices = get_binance_prices()
     if current_prices:
+        df = pd.DataFrame(current_prices)
+        df.to_csv('datos/binance_prices.csv', index=False)
+        print("Precios guardados en datos/binance_prices.csv")
+
         for item in current_prices:
             print(f"{item['symbol']}: {item['price']}")
