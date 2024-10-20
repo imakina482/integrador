@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import logging
 
 def get_binance_prices():
     """
@@ -18,9 +19,11 @@ def get_binance_prices():
         return prices
     
     except requests.exceptions.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")
+        logging.error(f"HTTP error occurred: {http_err}")
+        return None
     except Exception as err:
-        print(f"An error occurred: {err}")
+        logging.error(f"An error occurred: {err}")
+        return None
 
 if __name__ == "__main__":
     current_prices = get_binance_prices()
