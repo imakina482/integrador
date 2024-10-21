@@ -19,7 +19,6 @@ x-airflow-common:
   volumes:
     - ./dags:/opt/airflow/dags 
     - ./logs:/opt/airflow/logs 
-    - ./plugins:/opt/airflow/plugins 
 
 
   depends_on:
@@ -171,8 +170,8 @@ services:
           echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
           echo
         fi
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        mkdir -p /sources/logs /sources/dags
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags}
         exec /entrypoint airflow version
 
     environment:
