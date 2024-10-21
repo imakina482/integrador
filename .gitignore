@@ -18,8 +18,7 @@ __pycache__/
 *.pyd
 
 # Archivos de log
-*.log
-logs/
+
 
 # Archivos de salida y PID de Airflow
 airflow/*.err
