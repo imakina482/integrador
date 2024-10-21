@@ -52,21 +52,21 @@ def load_data_to_redshift():
         for index, row in df.iterrows():
             symbol = row['symbol']
             price = row['price']
-
+            
             # 1. Verificar si el registro ya existe y está activo
             cursor.execute("""
-                SELECT * FROM 2024_paola_torrealba_schema.binance
+                SELECT * FROM 2024_paola_torrealba_schema.binance 
                 WHERE symbol = %s AND registro_actual = TRUE;
             """, (symbol,))
             existing_record = cursor.fetchone()
-
+            
             if existing_record:
                 # Si el precio ha cambiado
                 if existing_record[1] != price:
                     # 2. Desactiva el registro anterior
                     cursor.execute("""
-                        UPDATE 2024_paola_torrealba_schema.binance
-                        SET fecha_fin = %s, registro_actual = FALSE
+                        UPDATE 2024_paola_torrealba_schema.binance 
+                        SET fecha_fin = %s, registro_actual = FALSE 
                         WHERE symbol = %s AND registro_actual = TRUE;
                     """, (current_time, symbol))
 
