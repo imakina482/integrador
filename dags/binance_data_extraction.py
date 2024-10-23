@@ -6,6 +6,7 @@ import psycopg2
 import pandas as pd
 from dotenv import load_dotenv
 import os
+import logging
 
 # Cargo las variables de entorno desde el archivo .env
 load_dotenv()
@@ -15,14 +16,21 @@ def run_binance_script():
     if not os.path.exists('datos'):
         os.makedirs('datos')
 
-    result = subprocess.run(
-        ['python', '/opt/airflow/binance_prices.py'],  # Cambia la ruta aquí
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    print("stdout:", result.stdout.decode())
-    print("stderr:", result.stderr.decode())
+    try:
+        result = subprocess.run(
+            ['python', '/opt/airflow/binance_prices.py'],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        logging.info(f"stdout: {result.stdout.decode()}")
+        logging.error(f"stderr: {result.stderr.decode()}")
+
+    except subprocess.CalledProcessError as err:
+        logging.error(f"Error al ejecutar el script binance_prices.py: {err}")
+
+    except Exception as e:
+        logging.error(f"Error inesperado: {e}")
 
 def connect_to_redshift():
     try:
@@ -33,10 +41,15 @@ def connect_to_redshift():
             password=os.getenv('REDSHIFT_PASSWORD'),
             port=os.getenv('REDSHIFT_PORT')
         )
-        print("Conexión exitosa a Redshift")
+        logging.info("Conexión exitosa a Redshift")
         return connection
+
+    except psycopg2.OperationalError as op_err:
+        logging.error(f"Error operacional al conectarse a Redshift: {op_err}")
+        return None
+
     except Exception as e:
-        print(f"Error al conectarse a Redshift: {e}")
+        logging.error(f"Error inesperado al conectarse a Redshift: {e}")
         return None
 
 def load_data_to_redshift():
@@ -83,11 +96,12 @@ def load_data_to_redshift():
                 """, (symbol, price, current_time))
 
         connection.commit()
-        print("Datos insertados o actualizados exitosamente en Redshift.")
+        logging.info("Datos insertados o actualizados exitosamente en Redshift.")
 
     except Exception as e:
-        print(f"Error al insertar o actualizar datos en Redshift: {e}")
+        logging.error(f"Error al insertar o actualizar datos en Redshift: {e}")
         connection.rollback()
+
     finally:
         cursor.close()
         connection.close()

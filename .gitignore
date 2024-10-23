@@ -6,6 +6,12 @@ env/
 *.cfg
 *.yaml
 
+# datos
+datos/
+
+# logs
+logs/
+
 # Archivos de configuración de editor
 .vscode/
 .idea/
