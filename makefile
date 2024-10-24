@@ -6,13 +6,8 @@ ENV_FILE=.env
 # Reglas
 
 # MAKE ALL => para configurar el entorno virtual
-all: check_env venv install_deps install_manual_deps fix_permissions
+all: check_env venv install_deps install_manual_deps
 
-fix_permissions:
-	@echo "Ajustando permisos en /opt/integrador/datos..."
-	sudo mkdir -p /opt/integrador/datos
-	sudo chown -R $(USER):$(USER) /opt/integrador/datos
-	sudo chmod -R 775 /opt/integrador/datos
 
 check_env:
 	@if [ ! -f $(ENV_FILE) ]; then \
@@ -56,4 +51,4 @@ streamlit_up:
 	@echo "Levantando la aplicación con Streamlit..."
 	streamlit run scripts/load_to_redshift_streamlit.py
 
-.PHONY: all check_env venv install_deps install_manual_deps docker_up docker_down clean test streamlit_up fix_permissions
+.PHONY: all check_env venv install_deps install_manual_deps docker_up docker_down clean test streamlit_up
