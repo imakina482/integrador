@@ -14,18 +14,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
 
-      - name: Run tests
-        run: |
-          python -m unittest discover tests/
+    - name: Install pandas and Airflow manually
+      run: |
+        source venv/bin/activate
+        pip install pandas==1.5.3 apache-airflow==2.10.1
+
+    - name: Run Tests with Unittest
+      run: |
+        source venv/bin/activate
+        python -m unittest discover tests/

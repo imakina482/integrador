@@ -1,97 +1,77 @@
+import os
+import logging
+import subprocess
+from datetime import datetime
+from dotenv import load_dotenv
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from datetime import datetime
-import subprocess
-import psycopg2
-import pandas as pd
-from dotenv import load_dotenv
-import os
+from binance_prices import get_binance_prices
+from process_data import process_binance_data
+from enrich_data import fetch_prices
+from convert_to_parquet import convert_csv_to_parquet
 
-# Cargo las variables de entorno desde el archivo .env
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 load_dotenv()
 
 def run_binance_script():
-    # Verifica si el directorio 'datos' existe, si no, lo crea
-    if not os.path.exists('datos'):
-        os.makedirs('datos')
+    """
+    Ejecuta el script binance_prices.py y captura su salida.
+    Crea la carpeta 'datos' si no existe.
+    """
+    datos_dir = '/opt/integrador/datos'
+    if not os.path.exists(datos_dir):
+        os.makedirs(datos_dir)
+        logging.info(f"Carpeta creada: {datos_dir}")
 
-    result = subprocess.run(
-        ['python', '/opt/airflow/binance_prices.py'],  # Cambia la ruta aquí
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    print("stdout:", result.stdout.decode())
-    print("stderr:", result.stderr.decode())
+    try:
+        result = subprocess.run(
+            ['python', '/opt/integrador/scripts/binance_prices.py'],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        logging.info(f"Script ejecutado exitosamente: {result.stdout.decode()}")
+        if result.stderr:
+            logging.warning(f"Advertencias durante la ejecución del script: {result.stderr.decode()}")
+    except subprocess.CalledProcessError as err:
+        logging.error(f"Error al ejecutar el script binance_prices.py: {err}")
+    except Exception as e:
+        logging.error(f"Error inesperado al ejecutar el script binance_prices.py: {e}")
 
 def connect_to_redshift():
+    """
+    Verifica la conexión a la base de datos Redshift.
+    """
+    from psycopg2 import connect
+
     try:
-        connection = psycopg2.connect(
+        connection = connect(
             host=os.getenv('REDSHIFT_HOST'),
             dbname=os.getenv('REDSHIFT_DBNAME'),
             user=os.getenv('REDSHIFT_USER'),
             password=os.getenv('REDSHIFT_PASSWORD'),
             port=os.getenv('REDSHIFT_PORT')
         )
-        print("Conexión exitosa a Redshift")
+        logging.info("Conexión exitosa a Redshift")
         return connection
     except Exception as e:
-        print(f"Error al conectarse a Redshift: {e}")
+        logging.error(f"Error al conectar a Redshift: {e}")
         return None
 
-def load_data_to_redshift():
+def verify_redshift_connection():
+    """
+    Verifica la conexión a Redshift y cierra la conexión si es exitosa.
+    """
     connection = connect_to_redshift()
-    if connection is None:
-        return
-
-    try:
-        df = pd.read_csv('datos/binance_prices.csv')
-        cursor = connection.cursor()
-        current_time = datetime.utcnow()
-
-        for index, row in df.iterrows():
-            symbol = row['symbol']
-            price = row['price']
-            
-            # 1. Verificar si el registro ya existe y está activo
-            cursor.execute("""
-                SELECT * FROM 2024_paola_torrealba_schema.binance 
-                WHERE symbol = %s AND registro_actual = TRUE;
-            """, (symbol,))
-            existing_record = cursor.fetchone()
-            
-            if existing_record:
-                # Si el precio ha cambiado
-                if existing_record[1] != price:
-                    # 2. Desactiva el registro anterior
-                    cursor.execute("""
-                        UPDATE 2024_paola_torrealba_schema.binance 
-                        SET fecha_fin = %s, registro_actual = FALSE 
-                        WHERE symbol = %s AND registro_actual = TRUE;
-                    """, (current_time, symbol))
-
-                    # 3. Inserta el nuevo registro con el nuevo precio
-                    cursor.execute("""
-                        INSERT INTO 2024_paola_torrealba_schema.binance (symbol, price, fecha_inicio, registro_actual)
-                        VALUES (%s, %s, %s, TRUE);
-                    """, (symbol, price, current_time))
-            else:
-                # 4. Si no existe, insertar un nuevo registro
-                cursor.execute("""
-                    INSERT INTO 2024_paola_torrealba_schema.binance (symbol, price, fecha_inicio, registro_actual)
-                    VALUES (%s, %s, %s, TRUE);
-                """, (symbol, price, current_time))
-
-        connection.commit()
-        print("Datos insertados o actualizados exitosamente en Redshift.")
-
-    except Exception as e:
-        print(f"Error al insertar o actualizar datos en Redshift: {e}")
-        connection.rollback()
-    finally:
-        cursor.close()
+    if connection:
+        logging.info("La conexión a Redshift fue exitosa. La carga de datos se gestionará desde Streamlit.")
         connection.close()
+    else:
+        logging.error("Falló la conexión a Redshift.")
 
+# Configuración del DAG de Airflow
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -99,19 +79,35 @@ default_args = {
     'retries': 1,
 }
 
-with DAG('binance_data_extraction',
-         default_args=default_args,
-         schedule='@daily',
-         catchup=False) as dag:
+with DAG(
+    'binance_data_extraction',
+    default_args=default_args,
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
 
-    run_script = PythonOperator(
+    run_script_task = PythonOperator(
         task_id='run_binance_script',
         python_callable=run_binance_script,
     )
 
-    load_data = PythonOperator(
-        task_id='load_data_to_redshift',
-        python_callable=load_data_to_redshift,
+    process_data_task = PythonOperator(
+        task_id='process_binance_data',
+        python_callable=process_binance_data,
     )
 
-    run_script >> load_data
+    enrich_data_task = PythonOperator(
+        task_id='fetch_price',
+        python_callable=fetch_prices,
+    )
+    convert_to_parquet_task = PythonOperator(
+        task_id='convert_to_parquet',
+        python_callable=convert_csv_to_parquet,
+    )
+    verify_connection_task = PythonOperator(
+        task_id='verify_redshift_connection',
+        python_callable=verify_redshift_connection,
+    )
+
+    run_script_task >> process_data_task >> enrich_data_task >> convert_to_parquet_task >> verify_connection_task
+

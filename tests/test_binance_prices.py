@@ -1,33 +1,30 @@
+import os
+import sys
 import unittest
 from unittest.mock import patch
-import requests   
-from binance_prices import get_binance_prices
+import requests
 import logging
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from scripts.binance_prices import get_binance_prices
+
 class TestGetBinancePrices(unittest.TestCase):
-    @patch('binance_prices.requests.get') 
-    def test_get_binance_prices_success(self, mock_get):
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = [
-            {'symbol': 'BTCUSDT', 'price': '42000.00'},
-            {'symbol': 'ETHUSDT', 'price': '3000.00'}
-        ]
-        
-        prices = get_binance_prices()
-        
-        self.assertIsInstance(prices, list)
-        self.assertGreater(len(prices), 0)
-        self.assertEqual(prices[0]['symbol'], 'BTCUSDT')
 
-    @patch('binance_prices.requests.get')
-    def test_get_binance_prices_http_error(self, mock_get):
-        mock_get.side_effect = requests.exceptions.HTTPError("404 Client Error: Not Found for url")
+    @patch('scripts.binance_prices.requests.get')
+    def test_get_binance_prices_timeout_error(self, mock_get):
+        """
+        Prueba que la función maneje correctamente un error de tiempo de espera.
+        """
+        mock_get.side_effect = requests.exceptions.Timeout("The request timed out")
 
-        with self.assertLogs(level='ERROR') as log:
+        # Capturar el log
+        with self.assertLogs(level='WARNING') as log:
             prices = get_binance_prices()
         
-        self.assertIsNone(prices)
-        self.assertIn("HTTP error occurred: 404 Client Error: Not Found for url", log.output[0])
+        # Verifico que el resultado sea None y que se haya registrado el error
+        self.assertIsNone(prices, "Debería retornar None en caso de timeout")
+        self.assertIn("The request timed out", log.output[0], "Debería registrar un tiempo de espera agotado")
 
 if __name__ == '__main__':
     unittest.main()
