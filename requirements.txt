@@ -1,7 +1,14 @@
 aiohttp==3.10.10
 alembic==1.13.3
 anyio==4.5.2
-apache-airflow==2.10.1
-pandas==1.5.3
 python-dotenv==1.0.1
 requests==2.32.3
+SQLAlchemy==1.4.53
+sqlalchemy-redshift==0.8.14
+SQLAlchemy-Utils==0.41.1
+psycopg2-binary==2.9.10
+sqlparse==0.4.4
+streamlit==1.39.0
+#pytest==7.4.0
+#apache-airflow==2.10.1
+#pandas==1.5.3
