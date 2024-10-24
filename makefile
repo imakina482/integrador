@@ -1,9 +1,16 @@
 # Variables
 PYTHON_VERSION=python3.8
 VENV_DIR=venv
+ENV_FILE=.env
 
 # Reglas
-all: venv install_deps install_manual_deps
+all: check_env venv install_deps install_manual_deps
+
+check_env:
+	@if [ ! -f $(ENV_FILE) ]; then \
+		echo "Error: El archivo $(ENV_FILE) no existe. Por favor, créalo antes de continuar."; \
+		exit 1; \
+	fi
 
 venv:
 	@echo "Creando el entorno virtual..."
@@ -33,4 +40,4 @@ test:
 	@echo "Ejecutando pruebas..."
 	$(VENV_DIR)/bin/python -m unittest discover -v tests/
 
-.PHONY: all venv install_deps install_manual_deps docker_up docker_down clean test
+.PHONY: all check_env venv install_deps install_manual_deps docker_up docker_down clean test
