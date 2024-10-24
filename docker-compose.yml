@@ -34,7 +34,7 @@ services:
   airflow-init:
     <<: *airflow-common
     command: bash -c "airflow db upgrade && airflow users create --username ${_AIRFLOW_WWW_USER_USERNAME} --password ${_AIRFLOW_WWW_USER_PASSWORD} --firstname Admin --lastname User --role Admin --email admin@example.com"
-    restart: no
+    restart: "no"
     depends_on:
       redis:
         condition: service_healthy
