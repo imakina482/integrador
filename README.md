@@ -74,8 +74,14 @@ Ejecución de pruebas: Se ejecutan las pruebas unitarias en cada push o pull req
 El proyecto incluye un Makefile para automatizar los pasos de configuración:
 
 Configurar el entorno y las dependencias:
-   make all
-Esto creará el entorno virtual, instalará las dependencias desde requirements.txt y las dependencias adicionales (pandas y Airflow) manualmente.
+`make all`
+Esto creará el entorno virtual
+
+instalar las dependencias desde requirements.txt
+`make install_deps` 
+
+Instalar dependencias adicionales (pandas y Airflow) manualmente.
+`make install_manual_deps` 
 
 Levantar el proyecto con Docker Compose:
 `make docker_up`
@@ -88,4 +94,9 @@ Ejecutar las pruebas:
 
 Limpiar el entorno eliminando el entorno virtual:
 `make clean`
-Además, el Makefile verifica automáticamente si el archivo .env existe antes de realizar cualquier configuración. Si no está presente, muestra un mensaje de error.
+
+Levantar streamLite:
+`make streamlit_up`
+
+Además, el Makefile verifica automáticamente si el archivo .env existe antes de realizar cualquier configuración. 
+Si no está presente, muestra un mensaje de error.
