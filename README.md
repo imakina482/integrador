@@ -1,4 +1,4 @@
-# TP integrador
+# TP integrador 
 
 Este proyecto tiene como objetivo procesar y cargar datos de criptomonedas obtenidos de la API de Binance en una base de datos Redshift.
 También permite enriquecer los datos con información adicional de CoinMarketCap y visualizar los resultados mediante una aplicación en Streamlit.
@@ -19,16 +19,17 @@ python3.8 -m venv venv
 source venv/bin/activate
 
 Instalar las dependencias desde requirements.txt:
-    pip install -r requirements.txt
+`pip install -r requirements.txt`
+    
 
 Instalar manualmente pandas y Airflow:
-    pip install pandas==1.5.3 apache-airflow==2.10.1
+`pip install pandas==1.5.3 apache-airflow==2.10.1`
 
 Ejecutar el proyecto con Docker Compose:
-docker-compose up
+`docker-compose up`
 
 Para detener los servicios usar:
-docker-compose down
+`docker-compose down`
 
 # Scripts Principales
 - binance_prices.py: Extrae los precios de criptomonedas desde Binance y los guarda en un archivo CSV.
@@ -77,14 +78,14 @@ Configurar el entorno y las dependencias:
 Esto creará el entorno virtual, instalará las dependencias desde requirements.txt y las dependencias adicionales (pandas y Airflow) manualmente.
 
 Levantar el proyecto con Docker Compose:
-   make docker_up
+`make docker_up`
 
 Detener los servicios de Docker Compose:
-   make docker_down
+`make docker_down`
 
 Ejecutar las pruebas:
-   make test
+`make test`
 
 Limpiar el entorno eliminando el entorno virtual:
-   make clean
+`make clean`
 Además, el Makefile verifica automáticamente si el archivo .env existe antes de realizar cualquier configuración. Si no está presente, muestra un mensaje de error.
