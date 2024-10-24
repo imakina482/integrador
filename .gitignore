@@ -7,11 +7,11 @@ env/
 *.yaml
 
 # datos
-datos/
-
+/datos/*
+!/datos/.gitkeep
 # logs
-logs/
-
+/logs/
+!/logs/.gitkeep
 # Archivos de configuración de editor
 .vscode/
 .idea/

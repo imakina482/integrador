@@ -9,11 +9,10 @@ from airflow.operators.python import PythonOperator
 from binance_prices import get_binance_prices
 from process_data import process_binance_data
 from enrich_data import fetch_prices
+from convert_to_parquet import convert_csv_to_parquet
 
-# Configuración básica del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Cargar variables de entorno desde el archivo .env
 load_dotenv()
 
 def run_binance_script():
@@ -101,11 +100,14 @@ with DAG(
         task_id='fetch_price',
         python_callable=fetch_prices,
     )
-
+    convert_to_parquet_task = PythonOperator(
+        task_id='convert_to_parquet',
+        python_callable=convert_csv_to_parquet,
+    )
     verify_connection_task = PythonOperator(
         task_id='verify_redshift_connection',
         python_callable=verify_redshift_connection,
     )
 
-    # Flujo de tareas
-    run_script_task >> process_data_task >> enrich_data_task >> verify_connection_task
+    run_script_task >> process_data_task >> enrich_data_task >> convert_to_parquet_task >> verify_connection_task
+
