@@ -19,10 +19,10 @@ python3.8 -m venv venv
 source venv/bin/activate
 
 Instalar las dependencias desde requirements.txt:
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
 Instalar manualmente pandas y Airflow:
-pip install pandas==1.5.3 apache-airflow==2.10.1
+    pip install pandas==1.5.3 apache-airflow==2.10.1
 
 Ejecutar el proyecto con Docker Compose:
 docker-compose up
@@ -56,13 +56,33 @@ registro_actual: Indicador que muestra si el registro es el más reciente (True)
 # Ejecución de Streamlit
 Para levantar la aplicación de Streamlit con las dos opciones de visualización:
 
- streamlit run scripts/load_to_redshift_streamlit.py 
+    streamlit run scripts/load_to_redshift_streamlit.py 
 
 #  Ejecutar las pruebas:
- python -m unittest discover -v tests/
+    python -m unittest discover -v tests/
 
 Pipeline de CI/CD
 El proyecto usa GitHub Actions para la integración continua, con los siguientes pasos:
 
 Instalación de dependencias: Las dependencias principales están en requirements.txt, pero algunas (pandas y Airflow) se instalan manualmente ya que tardan más.
 Ejecución de pruebas: Se ejecutan las pruebas unitarias en cada push o pull request.
+
+# Automatización de ambiente con makefile
+El proyecto incluye un Makefile para automatizar los pasos de configuración:
+
+Configurar el entorno y las dependencias:
+   make all
+Esto creará el entorno virtual, instalará las dependencias desde requirements.txt y las dependencias adicionales (pandas y Airflow) manualmente.
+
+Levantar el proyecto con Docker Compose:
+   make docker_up
+
+Detener los servicios de Docker Compose:
+   make docker_down
+
+Ejecutar las pruebas:
+   make test
+
+Limpiar el entorno eliminando el entorno virtual:
+   make clean
+Además, el Makefile verifica automáticamente si el archivo .env existe antes de realizar cualquier configuración. Si no está presente, muestra un mensaje de error.
