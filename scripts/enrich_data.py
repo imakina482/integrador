@@ -99,8 +99,8 @@ def fetch_prices():
     # Guardar los precios en un DataFrame y luego en un archivo CSV
     try:
         df = pd.DataFrame(prices)
-        df.to_csv('/opt/integrador/datos/crypto_prices.csv', mode='a', header=False, index=False)
-        logging.info("Precios guardados exitosamente en /opt/integrador/datos/crypto_prices.csv")
+        df.to_csv('/opt/integrador/datos/enriched_data.csv', mode='a', header=False, index=False)
+        logging.info("Precios guardados exitosamente en /opt/integrador/datos/enriched_data.csv")
     except Exception as e:
         logging.error(f"Error al guardar los precios en el archivo CSV: {e}")
 
