@@ -5,10 +5,10 @@ env/
 *.env
 *.cfg
 *.yaml
+#datos
+datos/*
+!datos/.gitkeep
 
-# datos
-/datos/*
-!/datos/.gitkeep
 # logs
 /logs/
 !/logs/.gitkeep
