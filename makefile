@@ -40,4 +40,9 @@ test:
 	@echo "Ejecutando pruebas..."
 	$(VENV_DIR)/bin/python -m unittest discover -v tests/
 
-.PHONY: all check_env venv install_deps install_manual_deps docker_up docker_down clean test
+# MAKE STREAMLIT_UP => para levantar Streamlit
+streamlit_up:
+	@echo "Levantando la aplicación con Streamlit..."
+	streamlit run scripts/load_to_redshift_streamlit.py
+
+.PHONY: all check_env venv install_deps install_manual_deps docker_up docker_down clean test streamlit_up
