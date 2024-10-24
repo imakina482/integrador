@@ -20,8 +20,7 @@ python3.8 -m venv venv
 source venv/bin/activate
 
 Instalar las dependencias desde requirements.txt:
-`pip install -r requirements.txt`
-    
+`pip install -r requirements.txt`    
 
 Instalar manualmente pandas y Airflow:
 `pip install pandas==1.5.3 apache-airflow==2.10.1`
@@ -31,6 +30,36 @@ Ejecutar el proyecto con Docker Compose:
 
 Para detener los servicios usar:
 `docker-compose down`
+# Automatización de ambiente con makefile
+El proyecto incluye un Makefile para automatizar los pasos de configuración:
+
+Configurar el entorno y las dependencias:
+`make all`
+Esto creará el entorno virtual venv 
+
+Instalar las dependencias desde requirements.txt
+`make install_deps` 
+
+Instalar dependencias adicionales (pandas y Airflow) manualmente.
+`make install_manual_deps` 
+
+Levantar el proyecto con Docker Compose:
+`make docker_up`
+
+Detener los servicios de Docker Compose:
+`make docker_down`
+
+Ejecutar las pruebas:
+`make test`
+
+Limpiar el entorno eliminando el entorno virtual:
+`make clean`
+
+Levantar streamLite:
+`make streamlit_up`
+
+Además, el Makefile verifica automáticamente si el archivo .env existe antes de realizar cualquier configuración. 
+Si no está presente, muestra un mensaje de error.
 
 # Scripts Principales
 - binance_prices.py: Extrae los precios de criptomonedas desde Binance y los guarda en un archivo CSV.
@@ -71,33 +100,4 @@ El proyecto usa GitHub Actions para la integración continua, con los siguientes
 Instalación de dependencias: Las dependencias principales están en requirements.txt, pero algunas (pandas y Airflow) se instalan manualmente ya que tardan más.
 Ejecución de pruebas: Se ejecutan las pruebas unitarias en cada push o pull request.
 
-# Automatización de ambiente con makefile
-El proyecto incluye un Makefile para automatizar los pasos de configuración:
 
-Configurar el entorno y las dependencias:
-`make all`
-Esto creará el entorno virtual venv 
-
-Instalar las dependencias desde requirements.txt
-`make install_deps` 
-
-Instalar dependencias adicionales (pandas y Airflow) manualmente.
-`make install_manual_deps` 
-
-Levantar el proyecto con Docker Compose:
-`make docker_up`
-
-Detener los servicios de Docker Compose:
-`make docker_down`
-
-Ejecutar las pruebas:
-`make test`
-
-Limpiar el entorno eliminando el entorno virtual:
-`make clean`
-
-Levantar streamLite:
-`make streamlit_up`
-
-Además, el Makefile verifica automáticamente si el archivo .env existe antes de realizar cualquier configuración. 
-Si no está presente, muestra un mensaje de error.
