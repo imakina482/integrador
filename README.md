@@ -10,8 +10,8 @@ También permite enriquecer los datos con información adicional de CoinMarketCa
 - Automatización de pruebas: Pruebas unitarias para verificar la funcionalidad de los scripts.
   
 # Clonar el repositorio:
-git clone https://TOKEN@github.com/imakina482/integrador.git
-cd integrador
+`git clone https://TOKEN@github.com/imakina482/integrador.git`
+`cd integrador`
 
 # Levantar el proyecto:
 Crear un entorno virtual con Python 3.8:
@@ -40,13 +40,13 @@ Para detener los servicios usar:
 Los datos se cargan en la base de datos Redshift manualmente utilizando streamlite. La tabla principal en Redshift es "binance"
 y tiene las sigueintes columnas :
 
-timestamp: Marca de tiempo.
-price: Precio de la criptomoneda en el momento registrado.
-volume: Cantidad total de la criptomoneda negociada en el periodo de tiempo registrado.
-symbol: Símbolo de la criptomoneda (por ejemplo, BTCUSDT).
-fecha_inicio: Fecha y hora de inicio del registro.
-fecha_fin: Fecha y hora de finalización del registro (puede usarse para indicar la validez temporal de los datos).
-registro_actual: Indicador que muestra si el registro es el más reciente (True) o si ha sido superado por uno más nuevo.
+1. timestamp: Marca de tiempo.
+2. price: Precio de la criptomoneda en el momento registrado.
+3. volume: Cantidad total de la criptomoneda negociada en el periodo de tiempo registrado.
+4. symbol: Símbolo de la criptomoneda (por ejemplo, BTCUSDT).
+5. fecha_inicio: Fecha y hora de inicio del registro.
+6. fecha_fin: Fecha y hora de finalización del registro (puede usarse para indicar la validez temporal de los datos).
+7. registro_actual: Indicador que muestra si el registro es el más reciente (True) o si ha sido superado por uno más nuevo.
 
 ![image](https://github.com/user-attachments/assets/9a15a0c1-fec8-43c3-b8a0-84377e313868)
 
@@ -57,12 +57,12 @@ registro_actual: Indicador que muestra si el registro es el más reciente (True)
 # Ejecución de Streamlit
 Para levantar la aplicación de Streamlit con las dos opciones de visualización:
 
-    streamlit run scripts/load_to_redshift_streamlit.py 
+`streamlit run scripts/load_to_redshift_streamlit.py` 
 
 ![image](https://github.com/user-attachments/assets/c20d9a87-6591-432d-8dc3-d048a722f085)
 
 #  Ejecutar las pruebas:
-    python -m unittest discover -v tests/
+`python -m unittest discover -v tests/`
 
 Pipeline de CI/CD
 El proyecto usa GitHub Actions para la integración continua, con los siguientes pasos:
@@ -75,9 +75,9 @@ El proyecto incluye un Makefile para automatizar los pasos de configuración:
 
 Configurar el entorno y las dependencias:
 `make all`
-Esto creará el entorno virtual
+Esto creará el entorno virtual venv 
 
-instalar las dependencias desde requirements.txt
+Instalar las dependencias desde requirements.txt
 `make install_deps` 
 
 Instalar dependencias adicionales (pandas y Airflow) manualmente.
