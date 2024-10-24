@@ -58,8 +58,7 @@ Para levantar la aplicación de Streamlit con las dos opciones de visualización
 
     streamlit run scripts/load_to_redshift_streamlit.py 
 
-    ![image](https://github.com/user-attachments/assets/7b83943a-4c84-4d2a-919d-f5fa2c98d635)
-
+![image](https://github.com/user-attachments/assets/c20d9a87-6591-432d-8dc3-d048a722f085)
 
 #  Ejecutar las pruebas:
     python -m unittest discover -v tests/
