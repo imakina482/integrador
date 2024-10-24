@@ -43,3 +43,4 @@ test:
 	$(VENV_DIR)/bin/python -m unittest discover -v tests/
 
 .PHONY: all check_env venv install_deps install_manual_deps docker_up docker_down clean test
+
