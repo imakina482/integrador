@@ -39,11 +39,15 @@ docker-compose down
 Los datos se cargan en la base de datos Redshift manualmente utilizando streamlite. La tabla principal en Redshift es "binance"
 y tiene las sigueintes columnas :
 
-symbol: Símbolo de la criptomoneda.
-price: Precio de la criptomoneda.
-fecha_inicio: Fecha y hora del registro.
 timestamp: Marca de tiempo.
-registro_actual: Indicador si es el registro actual.
+price: Precio de la criptomoneda en el momento registrado.
+volume: Cantidad total de la criptomoneda negociada en el periodo de tiempo registrado.
+symbol: Símbolo de la criptomoneda (por ejemplo, BTCUSDT).
+fecha_inicio: Fecha y hora de inicio del registro.
+fecha_fin: Fecha y hora de finalización del registro (puede usarse para indicar la validez temporal de los datos).
+registro_actual: Indicador que muestra si el registro es el más reciente (True) o si ha sido superado por uno más nuevo.
+
+![image](https://github.com/user-attachments/assets/9a15a0c1-fec8-43c3-b8a0-84377e313868)
 
 # Ejecución de Streamlit
 Para levantar la aplicación de Streamlit con las dos opciones de visualización:
