@@ -49,6 +49,10 @@ registro_actual: Indicador que muestra si el registro es el más reciente (True)
 
 ![image](https://github.com/user-attachments/assets/9a15a0c1-fec8-43c3-b8a0-84377e313868)
 
+# Airflow-webserver
+  http://localhost:8082/
+  ![imagen](https://github.com/user-attachments/assets/3dd4ba9d-da38-4ea9-8911-cc7fbd4df5fb)
+
 # Ejecución de Streamlit
 Para levantar la aplicación de Streamlit con las dos opciones de visualización:
 
