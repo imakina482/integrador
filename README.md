@@ -8,6 +8,9 @@ También permite enriquecer los datos con información adicional de CoinMarketCa
 - Enriquecimiento de datos: Integración de información adicional de CoinMarketCap.
 - Carga en Redshift: La carga de datos en la base de datos se realiza manualmente.
 - Automatización de pruebas: Pruebas unitarias para verificar la funcionalidad de los scripts.
+# Dependencias:
+1. python 3.8
+2. make 
   
 # Clonar el repositorio:
 `git clone https://TOKEN@github.com/imakina482/integrador.git`
