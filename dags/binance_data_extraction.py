@@ -1,6 +1,7 @@
 import os
 import logging
 import subprocess
+import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -10,6 +11,7 @@ from binance_prices import get_binance_prices
 from process_data import process_binance_data
 from enrich_data import fetch_prices
 from convert_to_parquet import convert_csv_to_parquet
+from load_to_redshift import connect_to_redshift, create_table_if_not_exists, load_data_to_redshift
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -18,7 +20,6 @@ load_dotenv()
 def run_binance_script():
     """
     Ejecuta el script binance_prices.py y captura su salida.
-    Crea la carpeta 'datos' si no existe.
     """
     datos_dir = '/opt/integrador/datos'
     if not os.path.exists(datos_dir):
@@ -40,36 +41,39 @@ def run_binance_script():
     except Exception as e:
         logging.error(f"Error inesperado al ejecutar el script binance_prices.py: {e}")
 
-def connect_to_redshift():
-    """
-    Verifica la conexión a la base de datos Redshift.
-    """
-    from psycopg2 import connect
-
-    try:
-        connection = connect(
-            host=os.getenv('REDSHIFT_HOST'),
-            dbname=os.getenv('REDSHIFT_DBNAME'),
-            user=os.getenv('REDSHIFT_USER'),
-            password=os.getenv('REDSHIFT_PASSWORD'),
-            port=os.getenv('REDSHIFT_PORT')
-        )
-        logging.info("Conexión exitosa a Redshift")
-        return connection
-    except Exception as e:
-        logging.error(f"Error al conectar a Redshift: {e}")
-        return None
-
 def verify_redshift_connection():
     """
-    Verifica la conexión a Redshift y cierra la conexión si es exitosa.
+    Verifica la conexión a Redshift.
     """
-    connection = connect_to_redshift()
-    if connection:
-        logging.info("La conexión a Redshift fue exitosa. La carga de datos se gestionará desde Streamlit.")
-        connection.close()
+    engine = connect_to_redshift()
+    if engine:
+        logging.info("Conexión exitosa a Redshift.")
+        engine.dispose()
     else:
         logging.error("Falló la conexión a Redshift.")
+
+def load_data_to_redshift_task():
+    """
+    Tarea que carga los datos en Redshift.
+    """
+    try:
+        # Cargar el archivo CSV como DataFrame
+        df = pd.read_csv('/opt/integrador/datos/enriched_data.csv')
+
+        # Conectar a Redshift
+        engine = connect_to_redshift()
+
+        if engine:
+            # Crear la tabla si no existe
+            create_table_if_not_exists(engine)
+            # Cargar los datos a Redshift
+            load_data_to_redshift(df, engine)
+            engine.dispose()
+            logging.info("Datos cargados exitosamente a Redshift.")
+        else:
+            logging.error("No se pudo conectar a Redshift.")
+    except Exception as e:
+        logging.error(f"Error en la tarea de carga a Redshift: {e}")
 
 # Configuración del DAG de Airflow
 default_args = {
@@ -100,14 +104,20 @@ with DAG(
         task_id='fetch_price',
         python_callable=fetch_prices,
     )
+
     convert_to_parquet_task = PythonOperator(
         task_id='convert_to_parquet',
         python_callable=convert_csv_to_parquet,
     )
+
     verify_connection_task = PythonOperator(
         task_id='verify_redshift_connection',
         python_callable=verify_redshift_connection,
     )
 
-    run_script_task >> process_data_task >> enrich_data_task >> convert_to_parquet_task >> verify_connection_task
+    load_data_to_redshift_op = PythonOperator(
+        task_id='load_data_to_redshift',
+        python_callable=load_data_to_redshift_task,
+    )
 
+    run_script_task >> process_data_task >> enrich_data_task >> convert_to_parquet_task >> verify_connection_task >> load_data_to_redshift_op

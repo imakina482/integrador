@@ -28,6 +28,8 @@ def transform_data():
                                          'Taker Buy Base Asset Volume', 'Taker Buy Quote Asset Volume',
                                          'Ignore'])
 
+        logging.info(f"Primeros valores de la columna 'Volume': {df['Volume'].head()}")
+
         # Convertir las columnas 'Open Time' y 'Close Time' a formato de fecha
         df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
         df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')

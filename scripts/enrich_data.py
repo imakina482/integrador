@@ -11,8 +11,8 @@ load_dotenv()
 COINMARKETCAP_API_KEY = os.getenv('COINMARKETCAP_API_KEY')
 
 # Crear la carpeta 'datos' si no existe
-if not os.path.exists('datos'):
-    os.makedirs('datos')
+if not os.path.exists('/opt/integrador/datos'):
+    os.makedirs('/opt/integrador/datos')
 
 # Configuraciones de la API de CoinMarketCap
 BASE_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
@@ -99,7 +99,14 @@ def fetch_prices():
     # Guardar los precios en un DataFrame y luego en un archivo CSV
     try:
         df = pd.DataFrame(prices)
-        df.to_csv('/opt/integrador/datos/enriched_data.csv', mode='a', header=False, index=False)
+        output_file = '/opt/integrador/datos/enriched_data.csv'
+
+        # Verificar si el archivo ya existe para agregar el encabezado solo si es necesario
+        if not os.path.isfile(output_file):
+            df.to_csv(output_file, mode='w', header=True, index=False)
+        else:
+            df.to_csv(output_file, mode='a', header=False, index=False)
+
         logging.info("Precios guardados exitosamente en /opt/integrador/datos/enriched_data.csv")
     except Exception as e:
         logging.error(f"Error al guardar los precios en el archivo CSV: {e}")

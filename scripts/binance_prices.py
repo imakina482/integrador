@@ -2,8 +2,8 @@ import requests
 import logging
 import time
 import pandas as pd
+from datetime import datetime
 
-# Configuración básica del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_binance_prices(retries=3, backoff_factor=2):
@@ -46,14 +46,21 @@ def get_binance_prices(retries=3, backoff_factor=2):
 
 def save_prices_to_csv(prices, filename='/opt/integrador/datos/binance_prices.csv'):
     """
-    Guarda los precios en un archivo CSV.
+    Guarda los precios en un archivo CSV y agrega columnas adicionales para fecha de inicio y fin.
 
     Args:
         prices (list): Lista de precios a guardar.
         filename (str): Nombre del archivo CSV.
     """
     try:
+        # Convertir la lista de precios en un DataFrame
         df = pd.DataFrame(prices)
+
+        # Agregar las columnas 'fecha_inicio' y 'fecha_fin'
+        df['fecha_inicio'] = datetime.now()
+        df['fecha_fin'] = None
+
+        # Guardo el DataFrame en un archivo CSV
         df.to_csv(filename, index=False)
         logging.info(f"Precios guardados en {filename}")
     except Exception as e:

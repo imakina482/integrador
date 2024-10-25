@@ -2,11 +2,10 @@ import pandas as pd
 import logging
 from transformacion import calculate_price_difference
 
-# Configuración de logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Columnas requeridas para el procesamiento
-REQUIRED_COLUMNS = ['Open Price', 'Close Price']
+REQUIRED_COLUMNS = ['price', 'fecha_inicio', 'fecha_fin']
 
 def process_binance_data(input_file='/opt/integrador/datos/binance_prices.csv', output_file='/opt/integrador/datos/enriched_data.csv'):
     """
@@ -32,11 +31,12 @@ def process_binance_data(input_file='/opt/integrador/datos/binance_prices.csv', 
             logging.error("Las siguientes columnas están ausentes en el archivo: %s", missing_columns)
             return
 
-        # Calcular la diferencia de precios
-        df['price_difference'] = df.apply(
-            lambda row: calculate_price_difference(row['Open Price'], row['Close Price']),
-            axis=1
-        )
+        # Verificar y calcular la diferencia de precios si las columnas relevantes están presentes
+        if 'price' in df.columns:
+            df['price_difference'] = df['price'].diff().fillna(0)
+        else:
+            logging.warning("La columna 'price' no está disponible para calcular la diferencia de precios.")
+            df['price_difference'] = 0
 
         # Manejo valores NaN si existen
         df.fillna(0, inplace=True)
